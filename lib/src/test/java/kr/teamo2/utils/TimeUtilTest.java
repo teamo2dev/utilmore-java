@@ -1,4 +1,4 @@
-package kr.teamo2;
+package kr.teamo2.utils;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -7,6 +7,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Set;
+
 import org.junit.jupiter.api.Test;
 
 class TimeUtilTest {

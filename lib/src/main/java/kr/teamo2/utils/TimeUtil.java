@@ -1,4 +1,4 @@
-package kr.teamo2;
+package kr.teamo2.utils;
 
 import java.time.DateTimeException;
 import java.time.DayOfWeek;
