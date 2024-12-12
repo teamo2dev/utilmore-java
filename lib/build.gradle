@@ -61,7 +61,7 @@ publishing {
         gpr(MavenPublication) {
             groupId = 'kr.teamo2'
             artifactId = 'utilmore'
-            version = '1.0.1'
+            version = '1.0.4'
 
             from(components.java)
         }
