@@ -29,5 +29,5 @@ jobs:
       - name: Publish package
         run: ./gradlew publish
         env:
-          GITHUB_USERNAME: ${{ secrets.CIAN_GITHUB_USERNAME }}
-          GITHUB_TOKEN: ${{ secrets.CIAN_GITHUB_TOKEN }}
+          NEXUS_USERNAME: ${{ secrets.NEXUS_USERNAME }}
+          NEXUS_PASSWORD: ${{ secrets.NEXUS_PASSWORD }}
