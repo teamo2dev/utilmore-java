@@ -27,33 +27,20 @@ public class TimeUtil {
     public static final ZoneId UTC_ZONE_ID = ZoneId.of("UTC");
 
     public static final ZoneId KST_ZONE_ID = ZoneId.of("Asia/Seoul");
-
-    private static final DateTimeFormatter STANDARD_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
-
-    private static final DateTimeFormatter STANDARD_SPACE_SPLIT_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-
     public static final DateTimeFormatter STANDARD_ONLY_DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
-
-    private static final DateTimeFormatter STANDARD_HH_MM_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
-
-    private static final DateTimeFormatter STANDARD_ZONED_DATE_TIME_FORMATTER = DateTimeFormatter.ISO_ZONED_DATE_TIME;
-
-    private static final DateTimeFormatter UTC_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
-
-    private static final DateTimeFormatter HH_MM_FORMATTER = DateTimeFormatter.ofPattern("HH:mm");
-
-    private static final DateTimeFormatter H_M_FORMATTER = new DateTimeFormatterBuilder()
-            .appendPattern("H:m")
-            .toFormatter();
-
-    private static final DateTimeFormatter YYYY_MM_DD_MINUS_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-
-    private static final DateTimeFormatter YYYY_MM_DD_SLASH_FORMATTER = DateTimeFormatter.ofPattern("yyyy/MM/dd");
-
-    private static final DateTimeFormatter[] YYYY_MM_DD_FORMATTERS = new DateTimeFormatter[]{YYYY_MM_DD_MINUS_FORMATTER, YYYY_MM_DD_SLASH_FORMATTER};
-
     public static final DateTimeFormatter YYYY_MM_DD_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd");
-
+    private static final DateTimeFormatter STANDARD_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+    private static final DateTimeFormatter STANDARD_SPACE_SPLIT_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    private static final DateTimeFormatter STANDARD_HH_MM_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
+    private static final DateTimeFormatter STANDARD_ZONED_DATE_TIME_FORMATTER = DateTimeFormatter.ISO_ZONED_DATE_TIME;
+    private static final DateTimeFormatter UTC_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
+    private static final DateTimeFormatter HH_MM_FORMATTER = DateTimeFormatter.ofPattern("HH:mm");
+    private static final DateTimeFormatter H_M_FORMATTER = new DateTimeFormatterBuilder()
+        .appendPattern("H:m")
+        .toFormatter();
+    private static final DateTimeFormatter YYYY_MM_DD_MINUS_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    private static final DateTimeFormatter YYYY_MM_DD_SLASH_FORMATTER = DateTimeFormatter.ofPattern("yyyy/MM/dd");
+    private static final DateTimeFormatter[] YYYY_MM_DD_FORMATTERS = new DateTimeFormatter[]{YYYY_MM_DD_MINUS_FORMATTER, YYYY_MM_DD_SLASH_FORMATTER};
     private static final DateTimeFormatter ZONED_DATETIME_STANDARD_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssXXX");
 
     public static LocalTime toLocalTime(Integer hour, Integer minutes) {
@@ -84,7 +71,7 @@ public class TimeUtil {
         }
         try {
             return LocalDate.of(LocalDate.now()
-                    .getYear(), month, day);
+                .getYear(), month, day);
         } catch (DateTimeException e) {
             return null;
         }
@@ -106,17 +93,17 @@ public class TimeUtil {
             return null;
         }
         return Arrays
-                .stream(YYYY_MM_DD_FORMATTERS)
-                .map(formatter -> {
-                    try {
-                        return LocalDate.parse(localDate, formatter);
-                    } catch (DateTimeParseException e) {
-                        return null;
-                    }
-                })
-                .filter(Objects::nonNull)
-                .findAny()
-                .orElse(null);
+            .stream(YYYY_MM_DD_FORMATTERS)
+            .map(formatter -> {
+                try {
+                    return LocalDate.parse(localDate, formatter);
+                } catch (DateTimeParseException e) {
+                    return null;
+                }
+            })
+            .filter(Objects::nonNull)
+            .findAny()
+            .orElse(null);
     }
 
     public static LocalDateTime toLocalDateTime(String dateTime) {
@@ -124,23 +111,23 @@ public class TimeUtil {
             return null;
         }
         return List.of(STANDARD_FORMATTER, STANDARD_HH_MM_FORMATTER, STANDARD_SPACE_SPLIT_FORMATTER, STANDARD_ZONED_DATE_TIME_FORMATTER)
-                .stream()
-                .map(formatter -> {
-                    try {
-                        return LocalDateTime.parse(dateTime, formatter);
-                    } catch (DateTimeParseException e) {
-                        return null;
-                    }
-                })
-                .filter(Objects::nonNull)
-                .findAny()
-                .orElse(null);
+            .stream()
+            .map(formatter -> {
+                try {
+                    return LocalDateTime.parse(dateTime, formatter);
+                } catch (DateTimeParseException e) {
+                    return null;
+                }
+            })
+            .filter(Objects::nonNull)
+            .findAny()
+            .orElse(null);
     }
 
     public static String toString(ZonedDateTime zonedDateTime) {
         try {
             if (zonedDateTime.getZone()
-                    .equals(ZoneOffset.UTC)) {
+                .equals(ZoneOffset.UTC)) {
                 return zonedDateTime.format(UTC_FORMATTER);
             } else {
                 return zonedDateTime.format(ZONED_DATETIME_STANDARD_FORMATTER);
@@ -216,8 +203,8 @@ public class TimeUtil {
             return Set.of();
         }
         return startDate.datesUntil(endDate.plusDays(1))
-                .filter(date -> Arrays.stream(dayOfWeeks).anyMatch(dayOfWeek -> dayOfWeek == date.getDayOfWeek()))
-                .collect(Collectors.toSet());
+            .filter(date -> Arrays.stream(dayOfWeeks).anyMatch(dayOfWeek -> dayOfWeek == date.getDayOfWeek()))
+            .collect(Collectors.toSet());
     }
 
     public static boolean isDateWithInRange(LocalDate date, LocalDate startDateInclusive, LocalDate endDateInclusive) {
