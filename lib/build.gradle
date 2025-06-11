@@ -33,6 +33,9 @@ dependencies {
 
     //springframework
     implementation 'org.springframework.boot:spring-boot-starter-web:3.5.0'
+
+    //aop
+    implementation 'org.springframework.boot:spring-boot-starter-aop:3.5.0'
 }
 
 // Apply a specific Java toolchain to ease working on different environments.
@@ -49,7 +52,7 @@ tasks.named('test') {
     useJUnitPlatform()
 }
 
-version = '1.0.7'
+version = '1.0.8'
 
 publishing {
     repositories {
