@@ -25,7 +25,7 @@ public class ApiLoggingAspect extends LoggingPointCut {
     }
 
     @AfterReturning(value = "logEnabled()", returning = "response")
-    public void apiAfterLogging(ResponseEntity response) {
-        apiLogger.afterLog(response);
+    public void apiAfterLogging(JoinPoint joinPoint, ResponseEntity response) {
+        apiLogger.afterLog(response, joinPoint);
     }
 }

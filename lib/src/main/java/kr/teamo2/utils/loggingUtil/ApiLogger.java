@@ -1,12 +1,15 @@
 package kr.teamo2.utils.loggingUtil;
 
+import static kr.teamo2.utils.trackingUtil.TrackingIdContext.getTrackingId;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.teamo2.utils.HttpServletUtil;
+import kr.teamo2.utils.trackingUtil.TrackingIdContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.aspectj.lang.JoinPoint;
-import org.springframework.http.HttpMethod;
+import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
@@ -18,54 +21,74 @@ public class ApiLogger extends LoggingPointCut {
     private final ObjectMapper objectMapper;
 
     public void beforeLog(JoinPoint joinPoint) {
-        String trackingId = HttpServletUtil.generateAndSetTrackingId();
+        LogEnabled logEnabled = ((MethodSignature) joinPoint.getSignature()).getMethod().getAnnotation(LogEnabled.class);
+        String customTrackingId = logEnabled != null ? logEnabled.trackingId() : "";
 
-        Object[] args = joinPoint.getArgs();
+        String trackingId = !customTrackingId.isEmpty() ? customTrackingId :
+            (getTrackingId() != null ? getTrackingId() :
+                HttpServletUtil.generateAndSetTrackingId());
 
-        String urlAndQueryString = HttpServletUtil.getUrlAndQueryString();
-        RequestLog.RequestLogBuilder requestLogBuilder = RequestLog.builder()
-            .requestID(trackingId)
-            .url(urlAndQueryString)
-            .method(HttpServletUtil.getHttpMethod())
-            .header(HttpServletUtil.requestToHeaderMap());
+        TrackingIdContext.setTrackingId(trackingId);
 
-        for (Object o : args) {
-            if (HttpServletUtil.getHttpMethod().equals(HttpMethod.POST.name())) {
-                try {
-                    String bodyJson = objectMapper.writeValueAsString(o);
-                    requestLogBuilder.body(bodyJson);
-                } catch (Exception e) {
-                    requestLogBuilder.body("Failed to serialize body: " + e.getMessage());
-                }
-            }
+        Version version = logEnabled != null ? logEnabled.version() : Version.FULL;
+
+        if (version == Version.ON_ERROR) {
+            return;
         }
-        log.info("[ApiLogger] - {}", requestLogBuilder.build());
+
+        requestLog(joinPoint);
     }
 
-    public void afterLog(ResponseEntity response) {
-        ResponseLog responseLog;
+    public void afterLog(ResponseEntity response, JoinPoint joinPoint) {
+        LogEnabled logEnabled = ((MethodSignature) joinPoint.getSignature()).getMethod().getAnnotation(LogEnabled.class);
+        Version version = logEnabled != null ? logEnabled.version() : Version.FULL;
         boolean isSuccessful = response.getStatusCode().is2xxSuccessful();
 
-        Object body = response.getBody();
-        String bodyJson = null;
-
-        try {
-            bodyJson = this.objectMapper.writeValueAsString(body);
-        } catch (JsonProcessingException e) {
-            bodyJson = String.valueOf(body);
+        if(version == Version.ON_ERROR){
+            if(isSuccessful){
+                return;
+            }
+            else {
+                requestLog(joinPoint);
+                responseLog(response);
+                return;
+            }
         }
 
-        responseLog = isSuccessful
-            ? ResponseLog.initSuccess()
-            .requestId(HttpServletUtil.getTrackingId())
-            .body(bodyJson)
-            .build()
-            : ResponseLog.initFail()
-                .requestId(HttpServletUtil.getTrackingId())
-                .body(bodyJson)
-                .statusCode(response.getStatusCode().value())
-                .build();
+        responseLog(response);
+    }
 
-        log.info("[ApiLogger] - {}", responseLog);
+    private void requestLog(JoinPoint joinPoint) {
+        String trackingId = getTrackingId();
+        Object[] args = joinPoint.getArgs();
+        RequestLog.RequestLogBuilder requestLogBuilder = RequestLog.builder();
+
+        for (Object o : args) {
+            try {
+                String requestJson = objectMapper.writeValueAsString(o);
+                requestLogBuilder.request(requestJson);
+            } catch (Exception e) {
+                requestLogBuilder.request("Failed to serialize request: " + e.getMessage());
+            }
+        }
+        log.info("{}: {}", trackingId, requestLogBuilder.build());
+    }
+
+    private void responseLog(ResponseEntity response) {
+        String trackingId = getTrackingId();
+        ResponseLog responseLog;
+        Object body = response.getBody();
+        String responseJson = null;
+        try {
+            responseJson = this.objectMapper.writeValueAsString(body);
+        } catch (JsonProcessingException e) {
+            responseJson = String.valueOf(body);
+        }
+
+        responseLog = ResponseLog.builder()
+            .response(responseJson)
+            .build();
+
+        log.info("{}: {}", trackingId, responseLog);
     }
 }

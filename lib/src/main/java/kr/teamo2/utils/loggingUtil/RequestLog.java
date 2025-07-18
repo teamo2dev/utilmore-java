@@ -14,13 +14,5 @@ import lombok.ToString;
 @ToString
 public class RequestLog {
 
-    private String requestID;
-
-    private String url;
-
-    private String method;
-
-    private Object header;
-
-    private Object body;
+    private Object request;
 }
