@@ -13,28 +13,14 @@ import lombok.ToString;
 @ToString
 public class ResponseLog {
 
-    private String requestID;
-
-    private Integer statusCode;
-
-    private Object body;
+    private Object response;
 
     private boolean isError;
 
-    @Builder(builderClassName = "InitSuccess", builderMethodName = "initSuccess")
-    public ResponseLog(String requestId, Object body) {
-        this.requestID = requestId;
-        this.statusCode = 200;
-        this.body = body;
+    @Builder
+    public ResponseLog(Object response) {
+        this.response = response;
         this.isError = false;
-    }
-
-    @Builder(builderClassName = "InitFail", builderMethodName = "initFail")
-    public ResponseLog(String requestId, Object body, Integer statusCode) {
-        this.requestID = requestId;
-        this.statusCode = statusCode;
-        this.body = body;
-        this.isError = true;
     }
 }
 

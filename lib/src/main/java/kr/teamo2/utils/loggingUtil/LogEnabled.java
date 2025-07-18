@@ -17,4 +17,8 @@ public @interface LogEnabled {
     String collection() default "";
 
     boolean isEnabled() default true;
+
+    Version version() default Version.FULL;
+
+    String trackingId() default "";
 }
