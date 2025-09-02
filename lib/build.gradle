@@ -52,7 +52,7 @@ tasks.named('test') {
     useJUnitPlatform()
 }
 
-version = '1.0.9'
+version = '1.0.10'
 
 publishing {
     repositories {
